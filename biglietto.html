@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AG Form | Biglietto</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <title>AG Form | Biglietto Transformers</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#070A12;
@@ -12,16 +12,16 @@
       --txt:#EAF0FF;
       --mut:rgba(234,240,255,.72);
       --line:rgba(255,255,255,.14);
-      --card:rgba(255,255,255,.06);
-      --card2:rgba(255,255,255,.10);
       --g: linear-gradient(135deg, #FF6B35 0%, #E91E63 45%, #1E88E5 100%);
       --g2: linear-gradient(135deg, #1E88E5 0%, #26C281 100%);
       --shadow: 0 30px 90px rgba(0,0,0,.55);
       --r: 22px;
     }
+    
     *{box-sizing:border-box;margin:0;padding:0}
+    
     body{
-      font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      font-family: Inter, system-ui, -apple-system, sans-serif;
       min-height:100vh;
       color:var(--txt);
       background:
@@ -36,35 +36,7 @@
       justify-content:center;
     }
 
-    /* --- OPENING REVEAL --- */
-    .veil{
-      position:fixed; inset:0;
-      background: radial-gradient(1200px 800px at 50% 40%, rgba(255,255,255,.06), transparent 55%),
-                  linear-gradient(180deg, rgba(0,0,0,.9), rgba(0,0,0,.92));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      z-index:9999;
-      animation: veilOut 900ms cubic-bezier(.2,.9,.2,1) forwards;
-      animation-delay: 850ms;
-    }
-    .veil .dot{
-      width: 10px; height: 10px;
-      border-radius: 999px;
-      background: white;
-      box-shadow: 0 0 0 0 rgba(255,255,255,.20);
-      animation: pulse 1.2s ease-in-out infinite;
-    }
-    @keyframes pulse{
-      0%{transform:scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,.18)}
-      60%{transform:scale(1.2); box-shadow: 0 0 0 22px rgba(255,255,255,0)}
-      100%{transform:scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0)}
-    }
-    @keyframes veilOut{
-      to{opacity:0; transform: translateY(-10px); pointer-events:none}
-    }
-
-    /* subtle moving scanline */
+    /* Scanline effect */
     .scan{
       position:fixed; inset:0;
       background: linear-gradient(180deg, transparent 0%, rgba(255,255,255,.05) 50%, transparent 100%);
@@ -78,33 +50,28 @@
       to{transform: translateY(120%)}
     }
 
-    .wrap{
-      width:min(920px, 100%);
-      display:grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 18px;
-      align-items:stretch;
+    .container{
+      width:min(1100px, 100%);
+      position:relative;
     }
 
-    /* left panel */
-    .panel{
-      position:relative;
+    /* ========== STAGE PRINCIPALE ========== */
+    .stage{
+      min-height: 480px;
       border-radius: var(--r);
       border: 1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
       box-shadow: var(--shadow);
       overflow:hidden;
-      padding: 22px;
-      transform: translateY(18px);
-      opacity: 0;
-      animation: rise 900ms cubic-bezier(.2,.9,.2,1) forwards;
-      animation-delay: 900ms;
-    }
-    @keyframes rise{
-      to{transform: translateY(0); opacity:1}
+      padding: 40px;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
     }
 
-    .panel::before{
+    /* Glow rotante di sfondo */
+    .stage::before{
       content:"";
       position:absolute; inset:-50%;
       background: conic-gradient(from 190deg, rgba(255,107,53,.18), rgba(233,30,99,.20), rgba(30,136,229,.20), rgba(38,194,129,.14), rgba(255,107,53,.18));
@@ -113,372 +80,519 @@
       animation: spin 18s linear infinite;
     }
     @keyframes spin{to{transform: rotate(360deg)}}
-    .panel > *{position:relative; z-index:1}
 
-    .top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      margin-bottom: 14px;
+    .stage > *{position:relative; z-index:1}
+
+    /* ========== LOGO INIZIALE ========== */
+    .logo-wrapper{
+      cursor: pointer;
+      transition: transform .3s ease;
+      position:relative;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      min-width:0;
+    
+    .logo-wrapper:hover{
+      transform: scale(1.05);
     }
-    .brand img{
-      height: 42px;
-      width:auto;
-      filter: drop-shadow(0 10px 18px rgba(0,0,0,.35));
+
+    .logo-wrapper.clicked{
+      pointer-events: none;
     }
-    .tag{
-      font-size:.85rem;
-      padding:.42rem .85rem;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.16);
-      background: rgba(0,0,0,.22);
+
+    .logo-img{
+      height: 180px;
+      width: auto;
+      filter: drop-shadow(0 20px 40px rgba(0,0,0,.5));
+      transition: opacity .5s ease, transform .5s ease;
+    }
+
+    .logo-wrapper.exploding .logo-img{
+      opacity: 0;
+      transform: scale(1.2);
+    }
+
+    .hint{
+      position:absolute;
+      bottom: -50px;
+      left:50%;
+      transform: translateX(-50%);
+      font-size: .95rem;
       color: var(--mut);
-      backdrop-filter: blur(12px);
+      opacity: .7;
+      animation: pulse-hint 2s ease-in-out infinite;
       white-space:nowrap;
     }
-    .link{
-      text-decoration:none;
-      color: var(--txt);
-      opacity:.85;
-      border:1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      padding:.55rem .9rem;
-      border-radius:999px;
-      transition: transform .2s ease, opacity .2s ease, background .2s ease;
-      user-select:none;
-      white-space:nowrap;
-    }
-    .link:hover{transform: translateY(-2px); opacity:1; background: rgba(255,255,255,.10)}
-
-    /* headline block */
-    .hero{
-      margin-top: 8px;
-      padding: 18px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(0,0,0,.22);
-      backdrop-filter: blur(14px);
+    
+    @keyframes pulse-hint{
+      0%, 100%{opacity:.7}
+      50%{opacity:.3}
     }
 
-    .line{
-      display:flex;
-      align-items:baseline;
-      gap: 12px;
-      flex-wrap:wrap;
+    .logo-wrapper.clicked .hint{
+      opacity:0;
     }
 
-    .big{
-      font-weight: 850;
-      letter-spacing: -0.05em;
-      font-size: clamp(2.2rem, 4.2vw, 3.2rem);
-      line-height: 1.05;
+    /* ========== PARTICELLE ESPLOSIONE ========== */
+    .particles{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity:0;
     }
-    .grad{
+
+    .particles.active{
+      opacity:1;
+    }
+
+    .particle{
+      position:absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
       background: var(--g);
+      top: 50%;
+      left: 50%;
+      opacity:0;
+    }
+
+    .particles.active .particle{
+      animation: explode 1.2s cubic-bezier(.2,.9,.2,1) forwards;
+    }
+
+    @keyframes explode{
+      0%{
+        opacity:1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100%{
+        opacity:0;
+        transform: translate(var(--tx), var(--ty)) scale(0);
+      }
+    }
+
+    /* ========== TRANSFORMERS LAYOUT ========== */
+    .transformers{
+      position:absolute;
+      inset:0;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap: 10px;
+      opacity:0;
+      pointer-events:none;
+    }
+
+    .transformers.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+
+    .name-row{
+      display:flex;
+      align-items:center;
+      gap: 22px;
+      position:relative;
+    }
+
+    /* Ogni lettera parte da centro e si espande */
+    .letter{
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      display:inline-block;
+      opacity:0;
+      transform: scale(0) rotate(45deg);
+      will-change: transform, opacity;
+    }
+
+    .transformers.active .letter{
+      animation: birth 1s cubic-bezier(.2,.9,.2,1) forwards;
+    }
+
+    @keyframes birth{
+      0%{
+        opacity:0;
+        transform: scale(0) rotate(45deg);
+      }
+      100%{
+        opacity:1;
+        transform: scale(1) rotate(0deg);
+      }
+    }
+
+    /* Stagger delle lettere */
+    .letter:nth-child(1){animation-delay: .1s}
+    .letter:nth-child(2){animation-delay: .15s}
+    .letter:nth-child(3){animation-delay: .2s}
+    .letter:nth-child(4){animation-delay: .25s}
+    .letter:nth-child(5){animation-delay: .3s}
+    .letter:nth-child(6){animation-delay: .35s}
+    .letter:nth-child(7){animation-delay: .4s}
+    .letter:nth-child(8){animation-delay: .45s}
+
+    /* A va in alto */
+    .andrea{
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      background: linear-gradient(135deg, #FF6B35 0%, #E91E63 100%);
       -webkit-background-clip:text;
       background-clip:text;
       color: transparent;
+      transform-origin: center;
     }
 
-    /* LETTER BREAK + MORPH */
-    .swap{
-      position:relative;
-      display:inline-block;
-      min-height: 1.15em;
-      cursor: default;
-    }
-    .layer{
-      display:inline-flex;
-      position:absolute;
-      left:0; top:0;
-      gap: .02em;
-      white-space:nowrap;
-      will-change: transform, opacity, filter;
-    }
-    .b{opacity:0}
-    .ch{
-      display:inline-block;
-      transform: translateY(0) scale(1);
-      opacity:1;
-      filter: blur(0);
-      transition:
-        transform 760ms cubic-bezier(.2,.9,.2,1),
-        opacity 760ms,
-        filter 760ms;
+    /* G va in basso */
+    .gonnella{
+      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      background: linear-gradient(135deg, #1E88E5 0%, #26C281 100%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color: transparent;
+      transform-origin: center;
     }
 
-    /* "explode" style */
-    .swap.is-on .a .ch{
+    /* FORM al centro */
+    .form-text{
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      color: var(--txt);
       opacity:0;
-      filter: blur(10px);
-      transform: translate(var(--dx), var(--dy)) rotate(var(--dr)) scale(.9);
-    }
-    .swap.is-on .b{opacity:1}
-    .swap.is-on .b .ch{
-      opacity:1;
-      filter: blur(0);
-      transform: translateY(0) scale(1);
-    }
-    .b .ch{
-      opacity:0;
-      filter: blur(12px);
-      transform: translateY(18px) scale(.98);
+      transform: translateY(20px);
     }
 
-    .sub{
-      margin-top: 12px;
+    .transformers.active .form-text{
+      animation: slideUp .8s cubic-bezier(.2,.9,.2,1) forwards;
+      animation-delay: .5s;
+    }
+
+    @keyframes slideUp{
+      to{
+        opacity:1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Tagline */
+    .tagline{
+      margin-top: 18px;
       color: var(--mut);
-      font-size: 1.03rem;
-      line-height:1.65;
-      max-width: 56ch;
+      font-size: 1.1rem;
+      max-width: 600px;
+      text-align:center;
+      opacity:0;
+      transform: translateY(20px);
     }
 
-    .cta{
-      margin-top: 16px;
-      display:flex;
-      gap: 12px;
-      flex-wrap:wrap;
+    .transformers.active .tagline{
+      animation: slideUp .8s cubic-bezier(.2,.9,.2,1) forwards;
+      animation-delay: .7s;
     }
+
+    /* ========== CARD CONTATTI ========== */
+    .info-card{
+      margin-top: 24px;
+      border-radius: var(--r);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      box-shadow: var(--shadow);
+      padding: 28px;
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      opacity:0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s cubic-bezier(.2,.9,.2,1) forwards;
+      animation-delay: 1.3s;
+    }
+
+    @keyframes fadeInUp{
+      to{
+        opacity:1;
+        transform: translateY(0);
+      }
+    }
+
+    .contact-item{
+      display:flex;
+      gap: 14px;
+      align-items:flex-start;
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+      transition: all .3s ease;
+    }
+
+    .contact-item:hover{
+      background: rgba(255,255,255,.08);
+      border-color: rgba(255,255,255,.16);
+      transform: translateY(-2px);
+    }
+
+    .contact-icon{
+      font-size: 1.6rem;
+      flex-shrink:0;
+    }
+
+    .contact-content strong{
+      display:block;
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+    }
+
+    .contact-content span,
+    .contact-content a{
+      display:block;
+      color: var(--mut);
+      font-size: .95rem;
+      text-decoration:none;
+      line-height:1.5;
+    }
+
+    .contact-content a:hover{
+      color: var(--txt);
+    }
+
+    /* ========== PULSANTI ========== */
+    .actions{
+      margin-top: 24px;
+      display:flex;
+      gap: 14px;
+      justify-content:center;
+      flex-wrap:wrap;
+      opacity:0;
+      transform: translateY(30px);
+      animation: fadeInUp 1s cubic-bezier(.2,.9,.2,1) forwards;
+      animation-delay: 1.5s;
+    }
+
     .btn{
       text-decoration:none;
       color: var(--txt);
-      font-weight: 800;
-      padding: .95rem 1.15rem;
+      font-weight: 700;
+      padding: .95rem 1.4rem;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.08);
       backdrop-filter: blur(12px);
-      transition: transform .2s ease, background .2s ease, border-color .2s ease, box-shadow .2s ease;
+      transition: all .3s ease;
       user-select:none;
     }
-    .btn:hover{transform: translateY(-2px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.24);}
+
+    .btn:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.12);
+      border-color: rgba(255,255,255,.24);
+    }
+
     .btn.primary{
       background: var(--g2);
       border-color: transparent;
       box-shadow: 0 14px 40px rgba(30,136,229,.28);
     }
-    .btn.primary:hover{box-shadow: 0 18px 55px rgba(30,136,229,.34);}
 
-    .micro{
-      margin-top: 10px;
-      color: rgba(234,240,255,.60);
-      font-size: .9rem;
+    .btn.primary:hover{
+      box-shadow: 0 18px 55px rgba(30,136,229,.34);
     }
 
-    /* right card */
-    .card{
-      border-radius: var(--r);
-      border: 1px solid var(--line);
-      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      padding: 22px;
-      transform: translateY(18px);
-      opacity: 0;
-      animation: rise 900ms cubic-bezier(.2,.9,.2,1) forwards;
-      animation-delay: 1040ms;
-      display:flex;
-      flex-direction:column;
-      justify-content:space-between;
-      gap: 14px;
-      position:relative;
+    .btn.reset{
+      background: rgba(255,107,53,.15);
+      border-color: rgba(255,107,53,.3);
     }
-    .card::after{
-      content:"";
-      position:absolute;
-      width: 260px; height: 260px;
-      right: -110px; bottom: -120px;
-      background: var(--g);
-      border-radius: 50%;
-      filter: blur(28px);
-      opacity:.22;
-    }
-    .card > *{position:relative; z-index:1}
 
-    .title{
-      font-weight: 900;
-      letter-spacing:-0.02em;
-      font-size: 1.15rem;
-      opacity:.95;
+    .btn.reset:hover{
+      background: rgba(255,107,53,.25);
     }
-    .row{
-      padding: 12px 0;
-      border-top: 1px solid rgba(255,255,255,.12);
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-    }
-    .k{width: 30px; text-align:center; opacity:.9; flex-shrink:0}
-    .v{min-width:0}
-    .v strong{display:block; font-size: 1.02rem; letter-spacing:-.01em}
-    .v span, .v a{display:block; color: var(--mut); font-size: .95rem; line-height:1.45}
-    .v a{color: var(--txt); opacity:.9; text-decoration:none; border-bottom: 1px dashed rgba(255,255,255,.22); width: fit-content;}
-    .v a:hover{opacity:1}
 
-    @media (max-width: 880px){
-      .wrap{grid-template-columns: 1fr;}
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 768px){
+      .stage{
+        min-height: 380px;
+        padding: 28px;
+      }
+      
+      .logo-img{
+        height: 140px;
+      }
+
+      .andrea, .gonnella{
+        font-size: 2.2rem;
+      }
+
+      .form-text{
+        font-size: 1.6rem;
+      }
+
+      .info-card{
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
     }
+
     @media (prefers-reduced-motion: reduce){
-      .veil, .scan, .panel, .card{animation:none !important; opacity:1; transform:none}
-      .swap .ch{transition:none}
+      *{animation: none !important; transition: none !important}
     }
   </style>
 </head>
 <body>
-  <div class="veil" aria-hidden="true"><div class="dot"></div></div>
   <div class="scan" aria-hidden="true"></div>
 
-  <main class="wrap">
-    <!-- LEFT -->
-    <section class="panel">
-      <div class="top">
-        <div class="brand">
-          <img src="logo.png" alt="AG Form">
-          <span class="tag">Biglietto da visita</span>
-        </div>
-        <!-- porta alla landing -->
-        <a class="link" href="index.html">Vai alla landing →</a>
+  <div class="container">
+    <div class="stage">
+      <!-- LOGO INIZIALE -->
+      <div class="logo-wrapper" id="logoWrapper">
+        <img src="logo.png" alt="AG Form Logo" class="logo-img">
+        <div class="hint">👆 Clicca per trasformare</div>
       </div>
 
-      <div class="hero">
-        <div class="line">
-          <div class="big grad">AG</div>
+      <!-- PARTICELLE ESPLOSIONE -->
+      <div class="particles" id="particles"></div>
 
-          <div class="big swap" id="swap">
-            <span class="layer a" aria-hidden="true"></span>
-            <span class="layer b" aria-hidden="true"></span>
-          </div>
-
-          <div class="big grad">FORM</div>
+      <!-- TRANSFORMERS FINALE -->
+      <div class="transformers" id="transformers">
+        <div class="name-row">
+          <div class="andrea" id="andrea"></div>
+        </div>
+        
+        <div class="form-text">FORM</div>
+        
+        <div class="name-row">
+          <div class="gonnella" id="gonnella"></div>
         </div>
 
-        <p class="sub">
-          Formazione finanziata e accesso ai fondi europei. Un referente unico, dalla strategia alla rendicontazione.
+        <p class="tagline">
+          Formazione finanziata e accesso ai fondi europei.<br>
+          Un referente unico, dalla strategia alla rendicontazione.
         </p>
-
-        <div class="cta">
-          <!-- Cambia questi -->
-          <a class="btn primary" href="https://wa.me/393331234567">WhatsApp</a>
-          <a class="btn" href="mailto:andrea.gonnella@agform.it">Email</a>
-          <a class="btn" href="#" id="replay">Rigioca animazione</a>
-        </div>
-
-        <div class="micro">All’apertura: “Form” si scompone e diventa “Andrea Gonnella”.</div>
       </div>
-    </section>
+    </div>
 
-    <!-- RIGHT -->
-    <aside class="card">
-      <div>
-        <div class="title">Contatti rapidi</div>
-
-        <div class="row">
-          <div class="k">👤</div>
-          <div class="v">
-            <strong>Andrea Gonnella</strong>
-            <span>HR Training Manager</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="k">🏢</div>
-          <div class="v">
-            <strong>AG Form</strong>
-            <span>Formazione finanziata · Fondi UE</span>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="k">📩</div>
-          <div class="v">
-            <strong>Email</strong>
-            <a href="mailto:andrea.gonnella@agform.it">andrea.gonnella@agform.it</a>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="k">💬</div>
-          <div class="v">
-            <strong>WhatsApp</strong>
-            <a href="https://wa.me/393331234567">+39 333 123 4567</a>
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="k">🌐</div>
-          <div class="v">
-            <strong>Landing</strong>
-            <a href="index.html">saolino91.github.io/agform/</a>
-          </div>
+    <!-- CARD CONTATTI -->
+    <div class="info-card">
+      <div class="contact-item">
+        <div class="contact-icon">👤</div>
+        <div class="contact-content">
+          <strong>Andrea Gonnella</strong>
+          <span>HR Training Manager</span>
         </div>
       </div>
 
-      <div class="cta">
-        <a class="btn" href="index.html">Torna alla landing</a>
-        <a class="btn primary" href="mailto:andrea.gonnella@agform.it?subject=Richiesta%20consulenza">Consulenza</a>
+      <div class="contact-item">
+        <div class="contact-icon">📩</div>
+        <div class="contact-content">
+          <strong>Email</strong>
+          <a href="mailto:andrea.gonnella@agform.it">andrea.gonnella@agform.it</a>
+        </div>
       </div>
-    </aside>
-  </main>
+
+      <div class="contact-item">
+        <div class="contact-icon">💬</div>
+        <div class="contact-content">
+          <strong>WhatsApp</strong>
+          <a href="https://wa.me/393331234567">+39 333 123 4567</a>
+        </div>
+      </div>
+
+      <div class="contact-item">
+        <div class="contact-icon">🌐</div>
+        <div class="contact-content">
+          <strong>Website</strong>
+          <a href="index.html">saolino91.github.io/agform/</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- AZIONI -->
+    <div class="actions">
+      <a class="btn primary" href="https://wa.me/393331234567">📱 Contattami su WhatsApp</a>
+      <a class="btn" href="mailto:andrea.gonnella@agform.it?subject=Richiesta%20consulenza">✉️ Richiedi consulenza</a>
+      <button class="btn reset" id="resetBtn">🔄 Rigioca animazione</button>
+    </div>
+  </div>
 
   <script>
-    function fillLayer(layer, text, isExplodeLayer) {
-      layer.innerHTML = "";
-      [...text].forEach((ch, i) => {
-        const s = document.createElement("span");
-        s.className = "ch";
-        s.textContent = (ch === " ") ? "\u00A0" : ch;
+    // ========== SETUP ==========
+    const logoWrapper = document.getElementById('logoWrapper');
+    const particles = document.getElementById('particles');
+    const transformers = document.getElementById('transformers');
+    const andreaDiv = document.getElementById('andrea');
+    const gonnellaDiv = document.getElementById('gonnella');
+    const resetBtn = document.getElementById('resetBtn');
 
-        // stagger
-        s.style.transitionDelay = (i * 28) + "ms";
+    let hasTransformed = false;
 
-        // random explode vectors (only for layer A)
-        if (isExplodeLayer) {
-          const dx = (Math.random() * 34 - 17).toFixed(1) + "px";
-          const dy = (Math.random() * 22 - 11).toFixed(1) + "px";
-          const dr = (Math.random() * 10 - 5).toFixed(1) + "deg";
-          s.style.setProperty("--dx", dx);
-          s.style.setProperty("--dy", dy);
-          s.style.setProperty("--dr", dr);
-        }
+    // ========== CREA PARTICELLE ==========
+    function createParticles() {
+      particles.innerHTML = '';
+      const count = 30;
+      
+      for(let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'particle';
+        
+        // Vettori casuali per esplosione radiale
+        const angle = (Math.PI * 2 * i) / count;
+        const distance = 150 + Math.random() * 100;
+        const tx = Math.cos(angle) * distance + 'px';
+        const ty = Math.sin(angle) * distance + 'px';
+        
+        p.style.setProperty('--tx', tx);
+        p.style.setProperty('--ty', ty);
+        
+        particles.appendChild(p);
+      }
+    }
 
-        layer.appendChild(s);
+    // ========== CREA LETTERE ==========
+    function createLetters(container, text) {
+      container.innerHTML = '';
+      [...text].forEach((char, i) => {
+        const span = document.createElement('span');
+        span.className = 'letter';
+        span.textContent = char;
+        span.style.animationDelay = (i * 0.05 + 0.1) + 's';
+        container.appendChild(span);
       });
     }
 
-    const swap = document.getElementById("swap");
-    const a = swap.querySelector(".a");
-    const b = swap.querySelector(".b");
+    // ========== TRASFORMAZIONE ==========
+    function transform() {
+      if(hasTransformed) return;
+      hasTransformed = true;
 
-    // Stato: Form -> Andrea Gonnella
-    fillLayer(a, "Form", true);
-    fillLayer(b, "Andrea Gonnella", false);
+      // 1. Logo esplode
+      logoWrapper.classList.add('clicked', 'exploding');
 
-    function play() {
-      swap.classList.remove("is-on"); // reset
-      // piccolo delay per far ripartire transizioni
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          swap.classList.add("is-on");
-        });
-      });
+      // 2. Particelle
+      particles.classList.add('active');
+
+      // 3. Dopo 600ms mostra transformers
+      setTimeout(() => {
+        createLetters(andreaDiv, 'ANDREA');
+        createLetters(gonnellaDiv, 'GONNELLA');
+        transformers.classList.add('active');
+      }, 600);
     }
 
-    // autoplay quando la pagina entra
-    window.addEventListener("load", () => {
-      setTimeout(play, 900);
-    });
+    // ========== RESET ==========
+    function reset() {
+      hasTransformed = false;
+      
+      logoWrapper.classList.remove('clicked', 'exploding');
+      particles.classList.remove('active');
+      transformers.classList.remove('active');
+      
+      andreaDiv.innerHTML = '';
+      gonnellaDiv.innerHTML = '';
+      
+      // Ricrea particelle per prossima animazione
+      setTimeout(createParticles, 300);
+    }
 
-    document.getElementById("replay").addEventListener("click", (e) => {
-      e.preventDefault();
-      play();
-    });
+    // ========== EVENTI ==========
+    logoWrapper.addEventListener('click', transform);
+    resetBtn.addEventListener('click', reset);
+
+    // ========== INIT ==========
+    createParticles();
   </script>
 </body>
 </html>
