@@ -591,11 +591,6 @@
     }
 
     // ========== CREA LETTERE ==========
-    /**
-     * Crea le lettere come elementi DOM
-     * IMPORTANTE: Non cerchiamo di calcolare le posizioni qui,
-     * lo faremo dopo che sono state renderizzate
-     */
     function createLetters(container, text) {
       container.innerHTML = '';
       
@@ -610,13 +605,20 @@
 
     // ========== OTTIENI POSIZIONI TARGET ==========
     /**
-     * Calcola le posizioni delle lettere dopo che sono state renderizzate
+     * FIX PRINCIPALE: Ora rendiamo visibile temporaneamente .transformers
+     * per calcolare le posizioni corrette delle lettere
      */
     function getLetterPositions() {
       const targets = [];
-      const canvasRect = canvas.getBoundingClientRect();
       
-      // Raccogli tutte le lettere (Andrea + Gonnella)
+      // TRUCCO: Rendi visibile temporaneamente il contenitore
+      // (senza animazione) per calcolare le posizioni
+      transformers.style.opacity = '1';
+      transformers.style.visibility = 'hidden'; // Visibile ma nascosto
+      
+      const stageRect = document.querySelector('.stage').getBoundingClientRect();
+      
+      // Raccogli tutte le lettere
       const allLetters = [
         ...andreaDiv.querySelectorAll('.letter'),
         ...gonnellaDiv.querySelectorAll('.letter')
@@ -625,16 +627,18 @@
       allLetters.forEach(letter => {
         const rect = letter.getBoundingClientRect();
         
-        // Calcola la posizione relativa al canvas
-        const targetX = (rect.left + rect.width / 2) - (canvasRect.left + canvas.width / 2);
-        const targetY = (rect.top + rect.height / 2) - (canvasRect.top + canvas.height / 2);
+        // Calcola posizione relativa allo stage
+        const centerX = rect.left + rect.width / 2 - stageRect.left;
+        const centerY = rect.top + rect.height / 2 - stageRect.top;
         
-        // Aggiungi offset per centrare nel canvas
-        targets.push({ 
-          x: targetX + canvas.width / 2, 
-          y: targetY + canvas.height / 2 
-        });
+        targets.push({ x: centerX, y: centerY });
       });
+
+      // Nascondi di nuovo il contenitore
+      transformers.style.opacity = '0';
+      transformers.style.visibility = 'visible';
+
+      console.log('Targets trovati:', targets.length, targets); // Debug
 
       return targets;
     }
@@ -667,10 +671,6 @@
     }
 
     // ========== TRASFORMAZIONE PRINCIPALE ==========
-    /**
-     * Funzione principale che orchestra tutta l'animazione
-     * FIX: Ora aspettiamo che le lettere siano renderizzate prima di calcolare le posizioni
-     */
     function transform() {
       if (hasTransformed) return;
       hasTransformed = true;
@@ -680,53 +680,51 @@
       // 1. Campiona i pixel del logo
       const logoPixels = sampleLogoPixels();
 
-      // 2. Crea le lettere nel DOM (ancora invisibili)
+      // 2. Crea le lettere nel DOM
       createLetters(andreaDiv, 'ANDREA');
       createLetters(gonnellaDiv, 'GONNELLA');
 
-      // 3. ASPETTA che il browser renderizzi le lettere
-      //    Usiamo requestAnimationFrame per essere sicuri che il layout sia calcolato
+      // 3. Aspetta che il browser renderizzi
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          // 4. Ora le lettere sono nel DOM e possiamo calcolare le posizioni
+          // 4. Calcola le posizioni (ora con il fix)
           const targets = getLetterPositions();
 
-          console.log('Targets trovati:', targets.length); // Debug
-
           if (targets.length === 0) {
-            console.error('Nessun target trovato! Le lettere potrebbero non essere visibili.');
+            console.error('Nessun target trovato!');
             return;
           }
 
-          // 5. Crea le particelle con le posizioni target corrette
+          // 5. Calcola l'offset per centrare nel canvas
+          const stageRect = document.querySelector('.stage').getBoundingClientRect();
+          const canvasOffsetX = logoWrapper.offsetLeft;
+          const canvasOffsetY = logoWrapper.offsetTop;
+
+          // 6. Crea le particelle
           logoPixels.forEach((pixel) => {
-            // Scegli un target casuale tra le lettere
             const target = targets[Math.floor(Math.random() * targets.length)];
             
             const particle = new Particle(
               pixel.x,
               pixel.y,
               pixel.color,
-              target.x,
-              target.y,
-              Math.random() * 30 // Delay casuale per effetto più organico
+              target.x - canvasOffsetX,
+              target.y - canvasOffsetY,
+              Math.random() * 30
             );
             
             particles.push(particle);
           });
 
-          console.log('Particelle create:', particles.length); // Debug
+          console.log('Particelle create:', particles.length);
 
-          // 6. Avvia l'animazione delle particelle
+          // 7. Avvia animazione
           animateParticles();
         });
       });
     }
 
     // ========== RESET ==========
-    /**
-     * Riporta tutto allo stato iniziale
-     */
     function reset() {
       if (animationFrame) {
         cancelAnimationFrame(animationFrame);
