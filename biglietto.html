@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AG Form | Biglietto da visita</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#0b1020;
+      --bg2:#0f1b3a;
+      --card: rgba(255,255,255,.08);
+      --card2: rgba(255,255,255,.12);
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,.75);
+      --line: rgba(255,255,255,.16);
+      --g1: linear-gradient(135deg, #FF6B35 0%, #E91E63 45%, #1E88E5 100%);
+      --g2: linear-gradient(135deg, #1E88E5 0%, #26C281 100%);
+      --shadow: 0 25px 70px rgba(0,0,0,.45);
+      --radius: 22px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family: Inter, system-ui, -apple-system, Segoe UI, sans-serif;
+      min-height: 100vh;
+      color: var(--text);
+      overflow-x:hidden;
+      background:
+        radial-gradient(900px 600px at 20% 10%, rgba(233,30,99,.25), transparent 60%),
+        radial-gradient(900px 600px at 80% 20%, rgba(30,136,229,.25), transparent 60%),
+        radial-gradient(900px 600px at 55% 85%, rgba(38,194,129,.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 28px 16px;
+    }
+
+    /* subtle animated noise grid */
+    .grid{
+      position:fixed; inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 38px 38px;
+      mask-image: radial-gradient(circle at 50% 30%, black 0%, transparent 70%);
+      opacity:.35;
+      pointer-events:none;
+      animation: drift 12s linear infinite;
+    }
+    @keyframes drift{
+      from{transform:translate3d(0,0,0)}
+      to{transform:translate3d(-38px,-38px,0)}
+    }
+
+    .wrap{
+      width: min(980px, 100%);
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 22px;
+      align-items: stretch;
+    }
+
+    /* Left: hero */
+    .hero{
+      border-radius: var(--radius);
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .hero::before{
+      content:"";
+      position:absolute; inset:-40%;
+      background: conic-gradient(from 180deg, rgba(255,107,53,.18), rgba(233,30,99,.18), rgba(30,136,229,.18), rgba(38,194,129,.14), rgba(255,107,53,.18));
+      filter: blur(30px);
+      opacity:.55;
+      animation: spin 18s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .hero > *{position:relative; z-index:1}
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .brand img{
+      height: 42px;
+      width:auto;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,.35));
+    }
+    .chip{
+      font-size:.85rem;
+      padding:.4rem .8rem;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      border: 1px solid rgba(255,255,255,.16);
+      color: var(--muted);
+      backdrop-filter: blur(10px);
+      white-space:nowrap;
+    }
+
+    /* Morph title */
+    .morph{
+      margin-top: 10px;
+      padding: 18px 18px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.18);
+      backdrop-filter: blur(14px);
+    }
+
+    .wordline{
+      display:flex;
+      align-items:baseline;
+      gap: 14px;
+      flex-wrap:wrap;
+    }
+
+    .big{
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      font-size: clamp(2.2rem, 4.2vw, 3.2rem);
+      line-height: 1.05;
+    }
+
+    .gradient{
+      background: var(--g1);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color: transparent;
+      text-shadow: 0 10px 40px rgba(0,0,0,.25);
+    }
+
+    .swap{
+      position:relative;
+      display:inline-block;
+      min-height: 1.2em;
+    }
+    .swap .a, .swap .b{
+      display:inline-flex;
+      gap: .03em;
+      position:absolute;
+      left:0; top:0;
+      white-space:nowrap;
+      will-change: transform, filter, opacity;
+    }
+    .swap .b{opacity:0}
+    .swap .letter{
+      display:inline-block;
+      transform: translateY(0);
+      filter: blur(0);
+      opacity:1;
+      transition: transform 700ms cubic-bezier(.2,.9,.2,1), opacity 700ms, filter 700ms;
+    }
+
+    /* State toggled */
+    .swap.is-on .a .letter{
+      opacity:0;
+      transform: translateY(-14px) rotate(-2deg);
+      filter: blur(8px);
+    }
+    .swap.is-on .b{
+      opacity:1;
+    }
+    .swap.is-on .b .letter{
+      opacity:1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    .swap .b .letter{
+      opacity:0;
+      transform: translateY(16px) rotate(1deg);
+      filter: blur(10px);
+    }
+
+    .sub{
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 1.02rem;
+      line-height: 1.6;
+      max-width: 52ch;
+    }
+
+    .actions{
+      margin-top: 18px;
+      display:flex;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      text-decoration:none;
+      color: var(--text);
+      font-weight: 700;
+      padding: .95rem 1.15rem;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      backdrop-filter: blur(12px);
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+      display:inline-flex;
+      align-items:center;
+      gap: 10px;
+      user-select:none;
+    }
+    .btn:hover{transform: translateY(-2px); background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.24);}
+    .btn.primary{
+      background: var(--g2);
+      border-color: transparent;
+      box-shadow: 0 14px 35px rgba(30,136,229,.25);
+    }
+    .btn.primary:hover{transform: translateY(-2px); box-shadow: 0 18px 45px rgba(30,136,229,.32);}
+
+    .mini{
+      margin-top: 14px;
+      display:flex;
+      gap: 14px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size: .95rem;
+    }
+    .mini a{color: var(--text); opacity:.9; text-decoration:none; border-bottom: 1px dashed rgba(255,255,255,.22)}
+    .mini a:hover{opacity:1}
+
+    /* Right: card */
+    .card{
+      border-radius: var(--radius);
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.06));
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::after{
+      content:"";
+      position:absolute;
+      width: 260px; height: 260px;
+      right: -90px; bottom: -110px;
+      background: var(--g1);
+      border-radius: 50%;
+      filter: blur(28px);
+      opacity:.25;
+    }
+    .card > *{position:relative; z-index:1}
+
+    .title{
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .row{
+      padding: 14px 0;
+      border-top: 1px solid rgba(255,255,255,.12);
+      display:flex;
+      align-items:flex-start;
+      gap: 12px;
+    }
+    .row:first-of-type{border-top: 1px solid rgba(255,255,255,.12)}
+    .k{
+      width: 30px;
+      text-align:center;
+      opacity:.9;
+      font-size: 1.05rem;
+      flex-shrink:0;
+    }
+    .v{
+      display:flex;
+      flex-direction:column;
+      gap: 4px;
+      min-width:0;
+    }
+    .v strong{
+      font-size: 1.02rem;
+      letter-spacing: -.01em;
+    }
+    .v span{
+      color: var(--muted);
+      font-size: .95rem;
+      line-height:1.4;
+      overflow-wrap:anywhere;
+    }
+    .v a{
+      color: var(--text);
+      text-decoration:none;
+      opacity:.92;
+      border-bottom: 1px dashed rgba(255,255,255,.22);
+      width: fit-content;
+    }
+    .v a:hover{opacity:1}
+
+    .hint{
+      margin-top: 14px;
+      color: rgba(234,240,255,.65);
+      font-size: .88rem;
+      line-height: 1.5;
+    }
+
+    /* Responsive */
+    @media (max-width: 880px){
+      .wrap{grid-template-columns: 1fr;}
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .grid, .hero::before{animation:none}
+      .swap .letter{transition:none}
+      .btn{transition:none}
+    }
+  </style>
+</head>
+<body>
+  <div class="grid" aria-hidden="true"></div>
+
+  <main class="wrap">
+    <!-- LEFT -->
+    <section class="hero">
+      <div class="topbar">
+        <div class="brand">
+          <img src="logo.png" alt="AG Form">
+          <span class="chip">Biglietto da visita</span>
+        </div>
+        <a class="btn" href="index.html" title="Torna alla home">← Home</a>
+      </div>
+
+      <div class="morph" role="group" aria-label="Identità">
+        <div class="wordline">
+          <div class="big gradient">AG</div>
+
+          <div class="big swap" id="swapName" aria-live="polite">
+            <span class="a" aria-hidden="true"></span>
+            <span class="b" aria-hidden="true"></span>
+          </div>
+
+          <div class="big gradient">FORM</div>
+        </div>
+
+        <p class="sub">
+          Formazione finanziata e accesso ai fondi europei. Ti porto dal bando al risultato, senza farti perdere tempo in burocrazia.
+        </p>
+
+        <div class="actions">
+          <!-- Cambia numero/email -->
+          <a class="btn primary" href="https://wa.me/393331234567">WhatsApp</a>
+          <a class="btn" href="mailto:andrea.gonnella@agform.it">Email</a>
+          <a class="btn" href="#qrcode" id="toggleBtn">Trasforma</a>
+        </div>
+
+        <div class="mini" id="qrcode">
+          <span>Tip: clicca “Trasforma” oppure attendi 2 secondi.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <aside class="card">
+      <div>
+        <div class="title">Contatti rapidi</div>
+
+        <div class="row">
+          <div class="k">👤</div>
+          <div class="v">
+            <strong>Andrea Gonnella</strong>
+            <span>HR Training Manager</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="k">🏢</div>
+          <div class="v">
+            <strong>AG Form</strong>
+            <span>Formazione finanziata · Fondi UE</span>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="k">📩</div>
+          <div class="v">
+            <strong>Email</strong>
+            <a href="mailto:andrea.gonnella@agform.it">andrea.gonnella@agform.it</a>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="k">💬</div>
+          <div class="v">
+            <strong>WhatsApp</strong>
+            <a href="https://wa.me/393331234567">+39 333 123 4567</a>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="k">🌐</div>
+          <div class="v">
+            <strong>Sito</strong>
+            <a href="index.html">Homepage AG Form</a>
+          </div>
+        </div>
+
+        <p class="hint">
+          Questa pagina è pensata per essere condivisa come link. È leggera e funziona al 100% su GitHub Pages.
+        </p>
+      </div>
+
+      <div class="actions" style="margin-top:18px">
+        <a class="btn" href="index.html">Torna al sito</a>
+        <a class="btn primary" href="mailto:andrea.gonnella@agform.it?subject=Richiesta%20consulenza">Prenota consulenza</a>
+      </div>
+    </aside>
+  </main>
+
+  <script>
+    // Utility: split text into spans with staggered delays
+    function fillLetters(container, text, baseDelay = 0) {
+      container.innerHTML = "";
+      [...text].forEach((ch, i) => {
+        const s = document.createElement("span");
+        s.className = "letter";
+        s.textContent = ch === " " ? "\u00A0" : ch;
+        s.style.transitionDelay = (baseDelay + i * 22) + "ms";
+        container.appendChild(s);
+      });
+    }
+
+    const swap = document.getElementById("swapName");
+    const a = swap.querySelector(".a");
+    const b = swap.querySelector(".b");
+
+    // Stato 0: mostra "Form" (come brand)
+    // Stato 1: mostra "Andrea Gonnella"
+    fillLetters(a, "Form", 0);
+    fillLetters(b, "Andrea Gonnella", 80);
+
+    function toggle() {
+      swap.classList.toggle("is-on");
+    }
+
+    document.getElementById("toggleBtn").addEventListener("click", (e) => {
+      e.preventDefault();
+      toggle();
+    });
+
+    // Auto: dopo 2s si trasforma, poi torna dopo 6s (effetto "wow" ma non invasivo)
+    setTimeout(() => {
+      swap.classList.add("is-on");
+      setTimeout(() => swap.classList.remove("is-on"), 6000);
+    }, 2000);
+
+    // Click sulla card morph per ripetere
+    swap.addEventListener("click", toggle);
+  </script>
+</body>
+</html>
