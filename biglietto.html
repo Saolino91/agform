@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AG Form | Andrea Gonnella</title>
   
+  <!-- ========== FAVICON ========== -->
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  
   <!-- Font professionale e moderno: Montserrat -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   
@@ -92,14 +97,13 @@
 
     /* ========== STAGE PRINCIPALE ========== */
     .stage{
-      /* FIX 1 DESKTOP: Altezza aumentata da 750px a 820px */
       min-height: 820px;
       border-radius: var(--r);
       border: 1px solid var(--line);
       background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.05));
       box-shadow: var(--shadow);
       overflow:hidden;
-      padding: 50px 40px; /* Più padding verticale per dare respiro */
+      padding: 50px 40px;
       position:relative;
       display:flex;
       align-items:center;
@@ -186,7 +190,7 @@
       text-align:center;
       padding-left: 30px;
       padding-right: 30px;
-      padding-bottom: 30px; /* FIX 1: Più spazio sotto */
+      padding-bottom: 30px;
       overflow-y: auto;
       z-index: 5;
     }
@@ -391,7 +395,6 @@
         border: none;
       }
       
-      /* FIX 2 MOBILE: Font più grande da 2.5rem a 3.2rem */
       .full-name{ 
         font-size: 3.2rem; 
       }
@@ -421,7 +424,6 @@
         border-radius: 16px;
       }
       
-      /* FIX 2 MOBILE: Font più grande anche su schermi piccoli da 2.2rem a 2.8rem */
       .full-name{ 
         font-size: 2.8rem; 
       }
