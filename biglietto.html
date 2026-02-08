@@ -133,6 +133,7 @@
     .logo-wrapper.hidden{
       opacity: 0;
       pointer-events: none;
+      visibility: hidden;
     }
 
     #particleCanvas{
@@ -163,14 +164,21 @@
       justify-content:center;
       gap: 8px;
       opacity:0;
+      visibility: hidden;
       pointer-events:none;
-      transition: opacity .6s ease;
       text-align:center;
       padding: 24px;
     }
     .name-display.active{
-      opacity:1;
+      opacity:1 !important;
+      visibility:visible !important;
       pointer-events:auto;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    @keyframes fadeIn{
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
     }
 
     .full-name{
@@ -196,6 +204,7 @@
       opacity:0;
       transform: translateY(22px) scale(.92);
       filter: blur(10px);
+      will-change: opacity, transform, filter;
     }
     
     .name-display.active .letter{
@@ -209,8 +218,7 @@
       background-clip:text;
       color: transparent;
       font-size: 1.3em;
-      text-shadow: 0 4px 20px rgba(255,138,60,.4);
-      filter: drop-shadow(0 2px 8px rgba(233,30,99,.3));
+      filter: drop-shadow(0 2px 12px rgba(233,30,99,.4));
     }
 
     /* G maiuscola con gradiente blu-verde */
@@ -220,8 +228,7 @@
       background-clip:text;
       color: transparent;
       font-size: 1.3em;
-      text-shadow: 0 4px 20px rgba(30,136,229,.4);
-      filter: drop-shadow(0 2px 8px rgba(38,194,129,.3));
+      filter: drop-shadow(0 2px 12px rgba(38,194,129,.4));
     }
 
     /* Lettere normali */
@@ -243,6 +250,7 @@
       color: var(--mut);
       font-size: 1.1rem;
       max-width: 720px;
+      line-height: 1.6;
       opacity:0;
       transform: translateY(16px);
     }
@@ -453,7 +461,7 @@
       update(){
         if (this.delay > 0){ this.delay -= 1; return; }
         if (this.t < 1) this.t = Math.min(1, this.t + this.speed);
-        const eased = 1 - Math.pow(1 - this.t, 4); // easeOutQuart
+        const eased = 1 - Math.pow(1 - this.t, 4);
         this.x = this.sx + (this.tx - this.sx) * eased;
         this.y = this.sy + (this.ty - this.sy) * eased;
       }
@@ -502,11 +510,9 @@
         const x = (canvas.width - w) / 2;
         const y = (canvas.height - h) / 2;
         ctx.drawImage(logoImage, x, y, w, h);
-        console.log('✅ Logo caricato');
       };
 
       logoImage.onerror = () => {
-        console.log('⚠️ Logo non trovato, uso fallback');
         drawFallbackLogo();
       };
     }
@@ -531,7 +537,6 @@
           }
         }
       }
-      console.log(`📊 Pixel campionati: ${pixels.length}`);
       return pixels;
     }
 
@@ -542,7 +547,6 @@
         const s = document.createElement('span');
         s.className = 'letter';
         
-        // Prima lettera (A o G) ha classe speciale
         if (i === 0 && highlightFirst){
           s.classList.add(highlightFirst);
         } else {
@@ -553,18 +557,15 @@
         s.style.animationDelay = (0.08 + i * 0.04) + 's';
         container.appendChild(s);
       });
-      console.log(`✏️ Lettere create per "${text}": ${container.querySelectorAll('.letter').length}`);
     }
 
-    // ====== POSIZIONI LETTERE (FIX COMPLETO) ======
+    // ====== POSIZIONI LETTERE ======
     function getLetterTargets(){
-      // TRUCCO: rendi visibile temporaneamente ma fuori schermo per calcolare
-      nameDisplay.style.position = 'absolute';
-      nameDisplay.style.opacity = '1';
+      // Mostra temporaneamente per calcolare
       nameDisplay.style.visibility = 'visible';
+      nameDisplay.style.opacity = '1';
       nameDisplay.style.pointerEvents = 'none';
       
-      // Forza il browser a calcolare il layout
       const forceLayout = nameDisplay.offsetHeight;
       
       const stageRect = document.querySelector('.stage').getBoundingClientRect();
@@ -573,7 +574,6 @@
 
       andreaDiv.querySelectorAll('.letter').forEach(el => {
         const r = el.getBoundingClientRect();
-        // Coordinate relative allo stage (non al canvas)
         A.push({
           x: (r.left + r.width/2) - stageRect.left,
           y: (r.top + r.height/2) - stageRect.top
@@ -587,9 +587,6 @@
           y: (r.top + r.height/2) - stageRect.top
         });
       });
-
-      console.log(`🎯 Target ANDREA: ${A.length}`, A[0]);
-      console.log(`🎯 Target GONNELLA: ${G.length}`, G[0]);
 
       // Nascondi di nuovo
       nameDisplay.style.opacity = '0';
@@ -614,14 +611,15 @@
         return;
       }
 
-      console.log('✨ Animazione particelle completata');
-
-      // Fine animazione: mostra testo e contatti
+      // Fine animazione
       setTimeout(() => {
         logoWrapper.classList.add('hidden');
-        nameDisplay.classList.add('active');
         canvas.style.opacity = '0';
-        console.log('👁️ Testo mostrato');
+        
+        // IMPORTANTE: rimuovi inline styles e usa solo classe
+        nameDisplay.style.opacity = '';
+        nameDisplay.style.visibility = '';
+        nameDisplay.classList.add('active');
       }, 150);
     }
 
@@ -630,28 +628,20 @@
       if (transformed) return;
       transformed = true;
 
-      console.log('🚀 Inizio trasformazione');
-
       logoWrapper.classList.add('transforming');
 
-      // Crea lettere con A e G in evidenza
       createLetters(andreaDiv, 'ANDREA', 'big-a');
       createLetters(gonnellaDiv, 'GONNELLA', 'big-g');
 
-      // Aspetta 2 frame per essere sicuri che il DOM sia aggiornato
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const pixels = samplePixels();
 
           if (pixels.length === 0){
-            console.log('⚠️ Nessun pixel trovato, ridisegno logo');
             drawFallbackLogo();
-            // Riprova dopo aver disegnato
             setTimeout(() => {
               const pixels2 = samplePixels();
               if (pixels2.length === 0) {
-                console.error('❌ Impossibile campionare pixel');
-                // Mostra comunque il testo
                 logoWrapper.classList.add('hidden');
                 nameDisplay.classList.add('active');
                 return;
@@ -669,15 +659,12 @@
       const { A, G } = getLetterTargets();
 
       if (A.length === 0 || G.length === 0){
-        console.error('❌ Nessun target trovato!');
-        // Mostra direttamente senza animazione
         logoWrapper.classList.add('hidden');
         nameDisplay.classList.add('active');
         canvas.style.opacity = '0';
         return;
       }
 
-      // Converti le coordinate da stage-relative a canvas-relative
       const stageRect = document.querySelector('.stage').getBoundingClientRect();
       const canvasRect = canvas.getBoundingClientRect();
       const offsetX = canvasRect.left - stageRect.left;
@@ -690,20 +677,17 @@
 
         particles.push(new Particle(
           px.x, px.y, px.color,
-          t.x - offsetX,  // Converti da stage a canvas
+          t.x - offsetX,
           t.y - offsetY,
           (Math.random()*26) | 0
         ));
       }
 
-      console.log(`🎨 ${particles.length} particelle create`);
       animate();
     }
 
     // ====== RESET ======
     function reset(){
-      console.log('🔄 Reset');
-      
       if (raf) cancelAnimationFrame(raf);
       raf = null;
 
@@ -711,6 +695,9 @@
       particles = [];
 
       nameDisplay.classList.remove('active');
+      nameDisplay.style.opacity = '';
+      nameDisplay.style.visibility = '';
+      
       logoWrapper.classList.remove('transforming', 'hidden');
 
       canvas.style.opacity = '1';
