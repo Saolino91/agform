@@ -158,6 +158,7 @@
       height: auto;
     }
 
+    /* FIX MOBILE: Hint più in alto */
     .hint{
       font-size: 0.85rem;
       color: var(--mut);
@@ -167,6 +168,8 @@
       font-weight: 500;
       letter-spacing: 0.5px;
       text-transform: uppercase;
+      position: absolute; /* FIX: posizionamento assoluto */
+      bottom: 60px; /* FIX: più in alto dal fondo */
     }
     @keyframes pulseHint{
       0%,100%{opacity:.45}
@@ -217,7 +220,7 @@
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      margin-bottom: 8px;
+      margin-bottom: 4px; /* Ridotto per fare spazio al ruolo */
     }
 
     .name-part{
@@ -266,6 +269,23 @@
         transform: translateY(0) scale(1);
         filter: blur(0);
       }
+    }
+
+    /* NUOVO: Ruolo "Training Manager" */
+    .job-title{
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-weight: 600;
+      color: var(--mut);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      opacity: 0;
+      transform: translateY(16px);
+      margin-bottom: 8px;
+    }
+
+    .name-display.active .job-title{
+      animation: slideUp .8s cubic-bezier(.2,.9,.2,1) forwards;
+      animation-delay: .35s; /* Appare dopo il nome */
     }
 
     .tagline{
@@ -398,6 +418,17 @@
       .full-name{ 
         font-size: 3.2rem; 
       }
+
+      /* FIX MOBILE: Hint ancora più in alto */
+      .hint{
+        bottom: 80px; /* Più in alto su mobile */
+        font-size: 0.8rem; /* Leggermente più piccolo */
+      }
+
+      .job-title{
+        font-size: 1rem;
+        letter-spacing: 1.5px;
+      }
       
       .name-display{
         padding-top: 30px;
@@ -427,6 +458,17 @@
       .full-name{ 
         font-size: 2.8rem; 
       }
+
+      /* FIX MOBILE PICCOLO: Hint molto più in alto */
+      .hint{
+        bottom: 100px;
+        font-size: 0.75rem;
+      }
+
+      .job-title{
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+      }
       
       .name-display{
         padding-top: 20px;
@@ -447,6 +489,7 @@
       <!-- LOGO INIZIALE -->
       <div class="logo-wrapper" id="logoWrapper" title="Interagisci per visualizzare i contatti">
         <canvas id="particleCanvas"></canvas>
+        <!-- FIX MOBILE: Hint posizionato assolutamente, più in alto -->
         <div class="hint">Seleziona per continuare</div>
       </div>
 
@@ -456,6 +499,9 @@
           <div class="name-part" id="andrea"></div>
           <div class="name-part" id="gonnella"></div>
         </div>
+
+        <!-- NUOVO: Ruolo professionale -->
+        <div class="job-title">Training Manager</div>
 
         <p class="tagline">
           Formazione finanziata e accesso ai fondi europei.<br>
